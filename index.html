@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -31,7 +30,7 @@
     button:hover {
       background-color: #45a049;
     }
-    .result {
+    .result, .hot-list {
       text-align: center;
       font-size: 1.5rem;
       margin-top: 2rem;
@@ -40,12 +39,19 @@
       border-radius: 12px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
+    .hot-list {
+      margin-top: 1rem;
+    }
   </style>
 </head>
 <body>
   <h1>大乐透号码预测</h1>
+  <label for="numSets">生成多少组号码：</label>
+  <input type="number" id="numSets" value="1" min="1" max="10">
   <button onclick="generate()">点击生成预测号码</button>
+  
   <div class="result" id="result"></div>
+  <div class="hot-list" id="hot-list"></div>
 
   <script>
     const history = [
@@ -82,12 +88,27 @@
       const front = [...new Set([...randomSample(hotFront, 3), ...randomSample(allFront, 2)])].sort((a, b) => a - b).slice(0, 5);
       const back = [...new Set([...randomSample(hotBack, 1), ...randomSample(allBack, 1)])].sort((a, b) => a - b).slice(0, 2);
 
-      return { front, back };
+      return { front, back, hotFront, hotBack };
     }
 
     function generate() {
-      const result = generatePrediction();
-      document.getElementById('result').innerHTML = `前区：${result.front.join(' ')}<br>后区：${result.back.join(' ')}`;
+      const numSets = document.getElementById('numSets').value;
+      let resultHTML = '';
+      let hotListHTML = '';
+
+      for (let i = 0; i < numSets; i++) {
+        const result = generatePrediction();
+        resultHTML += `<div>第 ${i + 1} 组：前区：${result.front.join(' ')} 后区：${result.back.join(' ')}</div>`;
+      }
+
+      hotListHTML = `
+        <h3>热号列表：</h3>
+        <div><strong>前区热号：</strong> ${result.hotFront.join(' ')}</div>
+        <div><strong>后区热号：</strong> ${result.hotBack.join(' ')}</div>
+      `;
+
+      document.getElementById('result').innerHTML = resultHTML;
+      document.getElementById('hot-list').innerHTML = hotListHTML;
     }
   </script>
 </body>
